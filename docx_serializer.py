@@ -19,6 +19,7 @@ def parse_collated_text(collated_text):
     collated_text_md = ""
     chunks = split_text(collated_text)
     for chunk in chunks:
+        chunk = chunk.replace(":", "")
         if chunk and re.search(r"\(\d+\) <.+?>", chunk):
             collated_text_md += f"[^{note_walker}]"
             note_walker += 1
@@ -97,7 +98,7 @@ def creat_docx_footnotes_at_end_of_page(text_id, collated_text, path):
     collated_text_md_nam += parse_note(collated_text)
     output_path_nam = path / f"{text_id}_format_namgyal.docx"
     convert_text(
-        collated_text_md_nam, "docx", "markdown", outputfile=str(output_path_nam)
+        collated_text_md_nam, "docx", "markdown", outputfile=str(output_path_nam),extra_args=['+RTS', '-K512M', '-RTS']
     )
     return output_path_nam
 

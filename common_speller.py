@@ -79,7 +79,6 @@ def get_common_spell(examplar_version_path, version_paths):
         (re.compile('་+'), '་'),
         (re.compile('\n'), ''),
         (re.compile('། ། ། །'), '།། །།'),
-        (re.compile(' །'), ' །​'),
         
         ]
     common_speller = CommonSpeller(FDMPaligner(), 
@@ -140,7 +139,7 @@ def get_hfml_CS_with_cs_and_four_edition(four_edition_paths, common_spell_text):
         (re.compile('་+'), '་'),
         (re.compile('\n'), ''),
         (re.compile('། ། ། །'), '།། །།'),
-        (re.compile(' །'), ' །​'),
+        # (re.compile(' །'), ' །​'),
         
         ]
     aligner = FDMPaligner() 
@@ -174,9 +173,11 @@ def get_four_edition_paths(work_dir):
     for version_path in version_paths:
         if version_path.stem in ['01chone', '02derge', '03narthang', '04peking']:
             four_edition_paths.append(version_path)
+    four_edition_paths.sort()
     return four_edition_paths
 
 def get_work_collated_docx(work_dir, text_id, docx_dir):
+    has_outlier = False
     version_paths, has_outlier = get_version_paths(work_dir)
     work_with_outliers.append(version_dir.stem)
     examplar_version_path = version_dir / '02derge.txt'
@@ -186,38 +187,63 @@ def get_work_collated_docx(work_dir, text_id, docx_dir):
 
     common_spell_text = get_common_spell(examplar_version_path, version_paths)
     (work_dir.parent.parent.joinpath('common_spell') / f'{text_id}.txt').write_text(common_spell_text, encoding='utf-8')
-    four_edition_paths = get_four_edition_paths(work_dir)
-    hfml_common_spell_text = get_hfml_CS_with_cs_and_four_edition(four_edition_paths, common_spell_text)
-    hfml_common_spell_text = hfml_common_spell_text.replace('\n', '')
-    normalized_hfml_common_spell_text = get_normalized_text(hfml_common_spell_text)
-    normalized_hfml_common_spell_text = resolve_missing_punct_note_text(normalized_hfml_common_spell_text)
-    collated_docx = creat_docx_footnotes_at_end_of_page(text_id, normalized_hfml_common_spell_text, docx_dir)
+    # common_spell_text = (work_dir.parent.parent.joinpath('common_spell') / f'{text_id}.txt').read_text(encoding='utf-8')
+    # four_edition_paths = get_four_edition_paths(work_dir)
+    # hfml_common_spell_text = get_hfml_CS_with_cs_and_four_edition(four_edition_paths, common_spell_text)
+    # hfml_common_spell_text = hfml_common_spell_text.replace('\n', '')
+    # # Path('./hfml.txt').write_text(hfml_common_spell_text, encoding='utf-8')
+    # normalized_hfml_common_spell_text = get_normalized_text(hfml_common_spell_text)
+    # # Path('./normalized.txt').write_text(normalized_hfml_common_spell_text, encoding='utf-8')
+    # normalized_hfml_common_spell_text = resolve_missing_punct_note_text(normalized_hfml_common_spell_text)
+    # # Path('./normalized.txt').write_text(normalized_hfml_common_spell_text, encoding='utf-8')
+    # collated_docx = creat_docx_footnotes_at_end_of_page(text_id, normalized_hfml_common_spell_text, docx_dir)
     
     # print(f'common spell for {version_dir.stem} is done')
     return has_outlier
 
     
 if __name__ == "__main__":
-    philo_id = '05-Chandrakirti'
+    
+    philo_ids = [
+        '01-Nagarjuna',
+        '02-Aryadeva',
+        '03-Buddhapalita',
+        '04-Bhavaviveka',
+        '05-Chandrakirti',
+        '06-Shantideva',
+        '07-Shantarakshita',
+        '08-Kamalashila',
+        '09-Asanga',
+        '10-Vasubandhu',
+        '11-Dignaga',
+        '12-Dharmakirti',
+        '13-Arya Vimuktisena',
+        '14-Haribhadra',
+        '15-Gunaprabha',
+        '16-Shakyaprabha',
+        '17-Atisha',
+    ]
+    for philo_id in philo_ids[:1]:
     #དེ་ལ་འཇུག་པ་ནི་དེ་ལ་བགྲོད་པ་སྟེ། གཉིས་གཉིས་སྤྲོད་
-    work_with_outliers = []
-    text_with_issue = []
-    philo_work_dirs = list(Path(f'./data/{philo_id}/works/').iterdir())
-    # philo_work_dirs = [Path('./test')]
-    Path(f'./data/{philo_id}/work_collated_docx').mkdir(parents=True, exist_ok=True)
-    Path(f'./data/{philo_id}/common_spell').mkdir(parents=True, exist_ok=True)
-    docx_dir = Path(f'./data/{philo_id}/work_collated_docx/')
-    philo_work_dirs.sort()
-    for version_dir in philo_work_dirs:
-        text_id = version_dir.stem
-
-        # print(f'working on {text_id}')
-        try:
-            has_outlier = get_work_collated_docx(version_dir, text_id, docx_dir)
-            if has_outlier:
-                work_with_outliers.append(text_id)
-        except:
-            text_with_issue.append(text_id)
-        
-    dump_yaml(work_with_outliers, Path(f'./data/{philo_id}/work_with_outliers.yaml'))
-    dump_yaml(text_with_issue, Path(f'./data/{philo_id}/text_with_issue.yaml'))
+        work_with_outliers = []
+        text_with_issue = []
+        philo_work_dirs = list(Path(f'./data/{philo_id}/works/').iterdir())
+        # philo_work_dirs = [Path('./test')]
+        Path(f'./data/{philo_id}/work_collated_docx').mkdir(parents=True, exist_ok=True)
+        Path(f'./data/{philo_id}/common_spell').mkdir(parents=True, exist_ok=True)
+        docx_dir = Path(f'./data/{philo_id}/work_collated_docx/')
+        philo_work_dirs.sort()
+        for version_dir in philo_work_dirs:
+            text_id = version_dir.stem
+            # if text_id == "E5D29E4E":
+            print(f'working on {text_id}')
+            try:
+                has_outlier = get_work_collated_docx(version_dir, text_id, docx_dir)
+                if has_outlier:
+                    work_with_outliers.append(text_id)
+            except:
+                text_with_issue.append(text_id)
+            
+            
+        dump_yaml(work_with_outliers, Path(f'./data/{philo_id}/work_with_outliers.yaml'))
+        dump_yaml(text_with_issue, Path(f'./data/{philo_id}/text_with_issue.yaml'))

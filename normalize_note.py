@@ -146,7 +146,7 @@ def get_left_context_valid_word(note,note_option,word=None):
             is_single_syl = False
     note_text = word
     left_syls = get_syls(note["left_context"])
-    if len(left_syls) == 0 or left_syls[-1][-1] in("།"," ", "།\u200b"):
+    if len(left_syls) == 0 or left_syls[-1][-1] in ("།"," ", "།\u200b"):
         return
     while char_walker >= -len(left_syls) and char_walker>=-3:
         # if left_syls[char_walker][-1] in ("།"," ", "\u200b"):
@@ -168,7 +168,8 @@ def get_left_context_valid_word(note,note_option,word=None):
 def get_right_context_valid_word(note,note_option,word=None):
     char_walker=0
     if word == None:
-        word = note_option.replace("།","་")
+        word = note_option
+        # word = note_option.replace("།","་")
     right_syls = get_syls(note["right_context"])
     if len(right_syls) == 0 or right_syls[0][0] in("།"," "):
         return
