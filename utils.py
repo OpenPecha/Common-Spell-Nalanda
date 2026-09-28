@@ -7,6 +7,11 @@ from botok.tokenizers.chunktokenizer import ChunkTokenizer
 
 wt = WordTokenizer()
 
+def has_incomplete_note(prev_chunk):
+    if re.search('\(\d+\) <.+?>', prev_chunk):
+        return True
+    return False
+
 def reformat_line_break(text):
     reformated_text = ''
     text = text.replace("\n", "")
@@ -52,6 +57,8 @@ def get_syls(text):
 
 
 def get_context(chunk, type_):
+    if type_ == "right":
+        chunk = re.sub(':.+', '', chunk)
     chunk = chunk.replace(':', '')
     context = ''
     syls = get_syls(chunk)
@@ -98,6 +105,7 @@ def get_note_options(default_option, note_chunk):
         '«ཅོ་»': 'chone',
         '«ཅོ»': 'chone'
     }
+    
     note_options = {
         'peking': '',
         'narthang': '',
@@ -355,9 +363,9 @@ def get_tokens(text):
     return tokens
 
 
-def get_option_span(note,option):
+def get_option_span(note,option,cur_note):
     start,end = note["span"]
-    z = re.search(f"\{option}",note["real_note"])
+    z = re.search(f"\{option}",cur_note)
     option_start = start+z.start()
     option_end = start+z.end()
     return option_start,option_end
